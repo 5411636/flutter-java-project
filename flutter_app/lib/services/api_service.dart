@@ -117,23 +117,33 @@ class ApiService {
   }
 
   static List<Map<String, dynamic>> _generateMockJobs(int count) {
-    final companies = ['字节跳动', '阿里巴巴', '腾讯', '美团', '京东', '华为', '小米', '网易', '快手', '滴滴'];
+    final companies = [
+      {'id': 1, 'name': '字节跳动', 'logoUrl': 'https://ui-avatars.com/api/?name=字节跳动&background=4A90E2&color=fff&size=100'},
+      {'id': 2, 'name': '阿里巴巴', 'logoUrl': 'https://ui-avatars.com/api/?name=阿里巴巴&background=FF6A00&color=fff&size=100'},
+      {'id': 3, 'name': '腾讯', 'logoUrl': 'https://ui-avatars.com/api/?name=腾讯&background=07C160&color=fff&size=100'},
+      {'id': 4, 'name': '美团', 'logoUrl': 'https://ui-avatars.com/api/?name=美团&background=FED600&color=333&size=100'},
+      {'id': 5, 'name': '京东', 'logoUrl': 'https://ui-avatars.com/api/?name=京东&background=E1251B&color=fff&size=100'},
+      {'id': 6, 'name': '华为', 'logoUrl': 'https://ui-avatars.com/api/?name=华为&background=CF1111&color=fff&size=100'},
+      {'id': 7, 'name': '小米', 'logoUrl': 'https://ui-avatars.com/api/?name=小米&background=FF4B00&color=fff&size=100'},
+      {'id': 8, 'name': '网易', 'logoUrl': 'https://ui-avatars.com/api/?name=网易&background=EB4B28&color=fff&size=100'},
+    ];
     final titles = ['Flutter开发工程师', '高级Java工程师', '前端开发', '产品经理', 'UI设计师', '数据分析师', '运营专员', '测试工程师'];
     final cities = ['北京', '上海', '杭州', '深圳', '广州', '成都', '武汉', '西安'];
     final salaries = ['15k-25k', '20k-35k', '25k-40k', '30k-50k', '35k-60k', '40k-70k'];
 
-    return List.generate(count, (i) => {
-      'id': i + 1,
-      'title': titles[i % titles.length],
-      'company': companies[i % companies.length],
-      'city': cities[i % cities.length],
-      'salary': salaries[i % salaries.length],
-      'experience': '${3 + (i % 5)}年',
-      'education': i % 2 == 0 ? '本科' : '硕士',
-      'tags': ['五险一金', '弹性工作', '零食下午茶', '带薪年假'].take((i % 3) + 1).toList(),
-      'logo': 'https://ui-avatars.com/api/?name=${companies[i % companies.length]}&background=random&size=100',
-      'viewCount': 100 + i * 37,
-      'createdAt': DateTime.now().subtract(Duration(days: i)).toIso8601String(),
+    return List.generate(count, (i) {
+      final company = companies[i % companies.length];
+      return {
+        'id': i + 1,
+        'title': titles[i % titles.length],
+        'company': company,
+        'city': cities[i % cities.length],
+        'salary': salaries[i % salaries.length],
+        'experience': '${3 + (i % 5)}年',
+        'education': i % 2 == 0 ? '本科' : '硕士',
+        'viewCount': 100 + i * 37,
+        'createdAt': DateTime.now().subtract(Duration(days: i)).toIso8601String(),
+      };
     });
   }
 }
