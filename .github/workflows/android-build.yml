@@ -20,18 +20,14 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Create fresh Flutter project and copy source
+      - name: Create fresh Flutter project
         run: |
-          # Create new clean flutter project
-          flutter create --platforms android flutter_build --project-name boss_recruitment
+          # Create brand new flutter project (this gives us clean android/)
+          flutter create --platforms android --org com.boss flutter_build
 
-          # Copy only lib, assets, and pubspec (NOT android - it's broken)
+          # Copy only our source code (NOT android - we want the fresh one)
           cp -r flutter_app/lib flutter_build/
           cp flutter_app/pubspec.yaml flutter_build/
-
-          # Replace the android directory with fresh one
-          rm -rf flutter_build/android
-          cp -r flutter_app/android flutter_build/ || true
 
       - name: Get dependencies
         run: |
