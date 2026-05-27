@@ -20,14 +20,27 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Create fresh Flutter project and copy source
+        run: |
+          # Create new clean flutter project
+          flutter create --platforms android flutter_build --project-name boss_recruitment
+
+          # Copy only lib, assets, and pubspec (NOT android - it's broken)
+          cp -r flutter_app/lib flutter_build/
+          cp flutter_app/pubspec.yaml flutter_build/
+
+          # Replace the android directory with fresh one
+          rm -rf flutter_build/android
+          cp -r flutter_app/android flutter_build/ || true
+
       - name: Get dependencies
         run: |
-          cd flutter_app
+          cd flutter_build
           flutter pub get
 
       - name: Generate JSON serializable files
         run: |
-          cd flutter_app
+          cd flutter_build
           dart run build_runner build --delete-conflicting-outputs
 
       - name: Setup JDK
@@ -38,13 +51,13 @@ jobs:
 
       - name: Build Debug APK
         run: |
-          cd flutter_app
+          cd flutter_build
           flutter build apk --debug
 
       - name: Create output directory
         run: |
           mkdir -p build
-          cp flutter_app/build/app/outputs/flutter-apk/app-debug.apk build/
+          cp flutter_build/build/app/outputs/flutter-apk/app-debug.apk build/
           ls -la build/
 
       - name: Upload APK
