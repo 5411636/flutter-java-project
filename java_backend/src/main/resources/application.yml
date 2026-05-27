@@ -21,7 +21,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 
 jwt:
-  secret: boss-recruitment-secret-key-2024-please-change-in-production
+  secret: boss-recruitment-secret-key-2024-please-change-in-production-this-key-is-very-long-and-secure-now
   expiration: 604800000  # 7 days in milliseconds
 
 springdoc:

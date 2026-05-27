@@ -1,0 +1,38 @@
+name: Build and Deploy Java Backend
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build JAR
+        run: |
+          cd java_backend
+          mvn clean package -DskipTests -q
+          ls -la target/*.jar
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            pkill -f 'java.*recruitment' || true
+            sleep 2
+            cd /root/flutter-java-project/java_backend
+            cp target/*.jar app.jar
+            nohup java -jar app.jar > /tmp/app.log 2>&1 &
+            sleep 5
+            tail -20 /tmp/app.log
