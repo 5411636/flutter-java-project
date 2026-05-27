@@ -1,0 +1,61 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone subdirectory
+        run: |
+          if [ -d "flutter_app" ]; then
+            mkdir -p output
+            cp -r flutter_app/* output/
+          fi
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Create Android project
+        run: |
+          cd output
+          flutter create --platforms android .
+          flutter pub get
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Debug APK
+        run: |
+          cd output
+          flutter build apk --debug
+
+      - name: Create output directory
+        run: |
+          mkdir -p build
+          cp output/build/app/outputs/flutter-apk/app-debug.apk build/
+          ls -la build/
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-android-apk
+          path: build/app-debug.apk
+
+      - name: Upload to Releases
+        run: |
+          gh release create flutter-build-v1 --repo YOUR_USERNAME/flutter-java-project --title "Flutter Android Build v1" build/app-debug.apk || true
