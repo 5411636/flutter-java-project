@@ -58,4 +58,4 @@ jobs:
 
       - name: Upload to Releases
         run: |
-          gh release create flutter-build-v1 --repo YOUR_USERNAME/flutter-java-project --title "Flutter Android Build v1" build/app-debug.apk || true
+          gh release create flutter-build-v1 --repo 5411636/flutter-java-project --title "Flutter Android Build v1" build/app-debug.apk || true
