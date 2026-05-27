@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:boss_recruitment/providers/job_provider.dart';
 import 'package:boss_recruitment/pages/job_detail_page.dart';
+import 'package:boss_recruitment/pages/chat_page.dart';
+import 'package:boss_recruitment/pages/resume_page.dart';
+import 'package:boss_recruitment/pages/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  final PageController _pageController = PageController();
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -49,33 +54,21 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await context.read<JobProvider>().fetchJobs(refresh: true);
-        },
-        child: Consumer<JobProvider>(
-          builder: (context, jobProvider, _) {
-            if (jobProvider.jobs.isEmpty && jobProvider.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            return ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(12),
-              itemCount: jobProvider.jobs.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return _buildHeader(context, jobProvider);
-                }
-
-                final job = jobProvider.jobs[index - 1];
-                return _buildJobCard(context, job);
-              },
-            );
-          },
-        ),
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) => setState(() => _currentIndex = index),
+        children: [
+          _buildJobList(),
+          const ChatPage(),
+          const ResumePage(),
+          const ProfilePage(),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.ease);
+        },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF00C2B3),
         items: const [
@@ -227,6 +220,36 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _pageController.dispose();
     super.dispose();
+  }
+
+  Widget _buildJobList() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        await context.read<JobProvider>().fetchJobs(refresh: true);
+      },
+      child: Consumer<JobProvider>(
+        builder: (context, jobProvider, _) {
+          if (jobProvider.jobs.isEmpty && jobProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          return ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(12),
+            itemCount: jobProvider.jobs.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return _buildHeader(context, jobProvider);
+              }
+
+              final job = jobProvider.jobs[index - 1];
+              return _buildJobCard(context, job);
+            },
+          );
+        },
+      ),
+    );
   }
 }
