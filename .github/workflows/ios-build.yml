@@ -47,7 +47,7 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p build
-          cp -r flutter_build/build/ios/iphonesimulator/Runner.app build/
+          cp -r flutter_build/build/ios/iphoneos/Runner.app build/
           cd build && zip -r Runner.ipa Runner.app
           ls -la
 
