@@ -1,7 +1,7 @@
 name: Build iOS IPA
 
 on:
-  workflow_dispatch:
+  workflow_dispatch
 
 permissions:
   contents: read
@@ -12,8 +12,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -36,27 +34,27 @@ jobs:
           cd flutter_build
           dart run build_runner build --delete-conflicting-outputs
 
-      - name: Build iOS for simulator
+      - name: Build iOS IPA (unsigned)
         run: |
           cd flutter_build
-          flutter build ios --simulator --no-codesign 2>&1 | tail -20
+          flutter build ipa --export-method=development --no-codesign 2>&1 | tail -30
         env:
           CODE_SIGNING_ALLOWED: "NO"
 
       - name: Create output directory
         run: |
           mkdir -p build
-          if [ -d "flutter_build/build/ios/iphonesimulator/Runner.app" ]; then
-            cp -r flutter_build/build/ios/iphonesimulator/Runner.app build/
-          fi
+          cp flutter_build/build/ios/ipa/Runner.ipa build/ 2>/dev/null || echo "IPA not found"
           ls -la build/
 
-      - name: Upload Artifact
+      - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-ios-simulator
-          path: build/Runner.app
+          name: flutter-ios-ipa
+          path: build/Runner.ipa
+          retention-days: 5
 
-      - name: Upload to Releases
+      - name: Download IPA info
+        if: success()
         run: |
-          gh release create flutter-ios-v1 --repo 5411636/flutter-java-project --title "Flutter iOS Build v1" build/Runner.ipa || true
+          ls -la flutter_build/build/ios/ipa/ 2>/dev/null || echo "No ipa dir"
