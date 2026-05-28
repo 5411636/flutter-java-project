@@ -51,11 +51,11 @@ jobs:
           fi
           ls -la build/
 
-      - name: Upload IPA
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-ios-ipa
-          path: build/Runner.ipa
+          name: flutter-ios-simulator
+          path: build/Runner.app
 
       - name: Upload to Releases
         run: |
